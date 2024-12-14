@@ -1,5 +1,3 @@
-# docker-compose.yml example for https://github.com/ServerContainers/samba
-
 services:
   samba:
     image: ghcr.io/servercontainers/samba
