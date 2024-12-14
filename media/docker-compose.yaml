@@ -1,0 +1,87 @@
+name: vpn-stack
+services:
+  delugevpn:
+    image: binhex/arch-delugevpn:latest
+    container_name: delugevpn
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - 8112:8112
+      - 8118:8118
+      - 58846:58846
+      - 58946:58946
+      - 9117:9117 # jackett
+      - 7878:7878 # radarr
+      - 8989:8989 # sonarr
+    volumes:
+      - /data/docker/media/vpn/data:/data
+      - /data/docker/media/vpn/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /ext-media/downloads:/downloads
+    env_file:
+      - .env
+    dns:
+      - 10.0.0.242
+      - 1.1.1.1
+    privileged: true
+    sysctls:
+      - "net.ipv4.conf.all.src_valid_mark=1"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    networks:
+      - proxy-net
+    restart: unless-stopped
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: jackett
+    network_mode: container:delugevpn
+    environment:
+      - TZ=Europe/Berlin
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /ext-media/old-torrents:/old-torrents # place where to put .torrent files for manual download
+      - /data/docker/media/jackett/config:/config # config files
+    restart: unless-stopped
+    depends_on:
+      - delugevpn
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    network_mode: container:delugevpn
+    environment:
+      - TZ=Europe/Berlin
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /data/docker/media/radarr/config:/config
+      - /ext-media/movies:/movies #optional
+      - /ext-media/downloads:/downloads
+        #- /path/to/downloadclient-downloads:/downloads #optional
+    restart: unless-stopped
+    depends_on:
+      - delugevpn
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    network_mode: container:delugevpn
+    environment:
+      - TZ=Europe/Berlin
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /data/docker/media/sonarr/config:/config
+      - /ext-media/tv:/tv #optional
+        #- /path/to/downloadclient-downloads:/downloads #optional
+      - /ext-media/downloads:/downloads
+    restart: unless-stopped
+    depends_on:
+      - delugevpn
+
+
+networks:
+  proxy-net:
+    external: true

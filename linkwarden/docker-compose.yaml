@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: linkwarden_db
+    env_file: .env
+    restart: always
+    volumes:
+      - /data/docker/linkwarden/pgdata:/var/lib/postgresql/data
+    networks:
+      - default
+  linkwarden:
+    image: ghcr.io/linkwarden/linkwarden:latest # comment this line to build from source
+    container_name: linkwarden
+    env_file: .env
+    environment:
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD}@postgres:5432/postgres
+    # build: . # uncomment this line to build from source
+    # ports:
+    #   - 3000:3000
+    volumes:
+      - /data/docker/linkwarden/data:/data/data
+    networks:
+      - default
+      - proxy-net
+    depends_on:
+      - postgres
+    restart: always
+
+networks:
+  proxy-net:
+    external: true

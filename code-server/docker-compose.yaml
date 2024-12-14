@@ -1,0 +1,126 @@
+services:
+  tex-server:
+    build: 
+      context: .
+      dockerfile: tex.Dockerfile
+    container_name: tex-server
+    # image: tex-server-image:latest
+    env_file:
+      - .env
+    volumes:
+      - /data/docker/tex-server:/config
+    ports:
+      - 9101:8443
+    restart: unless-stopped
+    networks:
+      - proxy-net
+
+  npm-server:
+    build: 
+      context: .
+      dockerfile: npm.Dockerfile
+    container_name: npm-server
+    env_file:
+      - .env
+    volumes:
+      - /data/docker/npm-server:/config
+    ports:
+      - 9102:8443
+      - 5173:5173
+    restart: unless-stopped
+    networks:
+      - proxy-net
+
+  ev-server:
+    build: 
+      context: .
+      dockerfile: ev.Dockerfile
+    container_name: ev-server
+    env_file:
+      - .env
+    environment:
+      - PASSWORD=${EVPASSWORD}    
+    volumes:
+      - /data/docker/ev-server:/config
+    ports:
+      - 9103:8443
+    restart: unless-stopped
+    networks:
+      - proxy-net
+
+  java-server:
+    build: 
+      context: .
+      dockerfile: java.Dockerfile
+    container_name: java-server
+    env_file:
+      - .env
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - PASSWORD=${EVPASSWORD}
+    volumes:
+      - /data/docker/java-server:/config 
+    ports:
+      - 9104:8443
+    restart: unless-stopped
+    networks:
+      - proxy-net
+
+  robotex-server:
+    image: robotex-server-image:latest
+    build: 
+      context: .
+      dockerfile: robotex.Dockerfile
+    container_name: robotex-server
+    env_file:
+      - .env
+    environment:
+      - PASSWORD=${ROBOPASSWORD}
+    volumes:
+      - /data/docker/robotex-server:/config
+    ports:
+      - 9105:8443
+    restart: unless-stopped
+    networks:
+      - proxy-net
+  haskell-server:
+    image: hk-server-image:latest
+    build: 
+      context: .
+      dockerfile: hk.Dockerfile
+    container_name: hk-server
+    env_file:
+      - .env
+    volumes:
+      - /data/docker/hk-server:/config
+    ports:
+      - 9106:8443
+      - 35109:35109
+      - 9100:9100
+      - 9101:9101
+      - 42707:42707
+      - 43615:43615
+    restart: unless-stopped
+    networks:
+      - proxy-net
+  flutter-server:
+    image: flutter-server-image:latest
+    build: 
+      context: .
+      dockerfile: flutter.Dockerfile
+    container_name: flutter-server
+    env_file:
+      - .env
+    volumes:
+      - /data/docker/flutter-server:/config
+    ports:
+      - 9107:8443
+    restart: unless-stopped
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true

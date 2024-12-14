@@ -1,0 +1,32 @@
+services:
+  monica:
+    container_name: monica
+    image: monica:latest
+    depends_on:
+      - db
+    ports:
+      - 8089:80
+    env_file:
+      - .env
+    volumes:
+      - /data/docker/monica/storage:/var/www/html/storage
+    restart: always
+    networks:
+      - default
+      - proxy-net
+
+  db:
+    container_name: monica-db
+    image: mariadb:11
+    env_file:
+      - .env
+    volumes:
+      - /data/docker/monica/mysql:/var/lib/mysql
+    restart: always
+    networks:
+      - default
+
+networks:
+  default:
+  proxy-net:
+    external: true

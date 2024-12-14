@@ -1,0 +1,2 @@
+# Monica
+Here i store information from contacts that I do not regularly keep in touch with. Expecially for conversations its nice to have a small protocol that I can go through when I meet them the next time

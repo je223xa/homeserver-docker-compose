@@ -1,0 +1,39 @@
+version: "2.1"
+services: 
+  nocodb: 
+    container_name: nocodb
+    image: nocodb/nocodb:latest
+    env_file: .env
+    ports: 
+      - 8090:8080
+    volumes: 
+      - /data/docker/nocodb/nc_data:/usr/app/data
+    restart: always
+    networks:
+      - proxy-net
+      - default
+    depends_on: 
+      root_db: 
+        condition: service_healthy
+  root_db: 
+    container_name: nocodb-db
+    image: mysql:8.3.0
+    env_file: .env
+    healthcheck: 
+      retries: 10
+      test: 
+        - CMD
+        - mysqladmin
+        - ping
+        - "-h"
+        - localhost
+      timeout: 20s
+    restart: always
+    volumes: 
+      - /data/docker/nocodb/db_data:/var/lib/mysql
+    networks:
+      - default
+
+networks:
+  proxy-net:
+    external: true

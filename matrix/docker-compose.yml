@@ -1,0 +1,72 @@
+services:
+  matrix:
+    image: matrixdotorg/synapse:latest
+    container_name: matrix
+    stdin_open: true
+    tty: true
+    volumes:
+        - /data/docker/matrix/data:/data
+    ports:
+      - 8008:8008
+    environment:
+        - SYNAPSE_SERVER_NAME=matrix.jonnyebinger.de
+        - SYNAPSE_REPORT_STATS=yes
+    # command: generate
+    networks: 
+      proxy-net:
+        ipv4_address: 172.19.0.14
+      default:
+    restart: unless-stopped
+  webhook:
+    container_name: matrix-webhook
+    image: matrix-webhook-image
+    restart: unless-stopped
+    env_file:
+      - .env
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./store:/config
+    depends_on: 
+      - matrix
+  syncv3postgres:
+    image: postgres:13
+    container_name: syncv3postgres
+    env_file:
+      - ./.env
+    volumes:
+      - syncv3_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s  
+    networks:
+      proxy-net:
+        ipv4_address: 172.19.0.17
+  syncv3:
+    image: ghcr.io/matrix-org/sliding-sync:latest
+    container_name: syncv3
+    depends_on:
+      syncv3postgres:
+        condition: service_healthy
+      matrix:
+        condition: service_started
+    ports:
+      - ${SYNCV3_PORT}:${SYNCV3_PORT}
+    env_file:
+      - ./.env
+    networks: 
+      proxy-net:
+        ipv4_address: 172.19.0.16
+networks:
+  proxy-net: 
+    external:
+      true
+
+
+volumes:
+  syncv3_postgres:

@@ -1,0 +1,49 @@
+services:
+  ollama:
+    volumes:
+      - ollama:/root/.ollama
+    # Uncomment below to expose Ollama API outside the container stack
+    # ports:
+    #   - 11434:11434
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    image: ollama/ollama:latest
+    networks:
+      - default
+  open-webui:
+    build:
+      context: .
+      args:
+        OLLAMA_BASE_URL: '/ollama'
+      dockerfile: Dockerfile
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    volumes:
+      - /data/docker/ollama:/app/backend/data
+    depends_on:
+      - ollama
+    ports:
+      - 9007:8080
+    env_file:
+      - .env
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+    networks:
+      - default
+      - proxy-net
+
+volumes:
+  ollama:
+    name: ollama
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: '/data/docker/ollama'
+ 
+networks:
+  proxy-net:
+    external: true

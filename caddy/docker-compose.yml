@@ -1,0 +1,25 @@
+services:
+  caddy:
+    # image: caddy:2.7.5
+    image: caddy:2.8.4
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+      - "9002:9002"
+    volumes:
+      - /data/docker/caddy/Caddyfile:/etc/caddy/Caddyfile
+      - /data/docker/caddy/site:/srv
+      - /data/docker/caddy/data:/data
+      - /data/docker/caddy/config:/config
+      - /data/docker/caddy/caddyfiles:/caddyfiles
+    networks:
+        - proxy-net
+    # needed for nextcloud aio
+    extra_hosts: ["host.docker.internal:host-gateway"]
+
+networks:
+  proxy-net:
+    external: true

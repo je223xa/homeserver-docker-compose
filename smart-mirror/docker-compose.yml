@@ -1,0 +1,14 @@
+services:
+  magicmirror:
+    container_name: mm
+    image: karsten13/magicmirror:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - /data/docker/smart-mirror/config:/opt/magic_mirror/config
+      - /data/docker/smart-mirror/compliments.json:/opt/magic_mirror/config/compliments.json
+      - /data/docker/smart-mirror/${MM_MODULES_DIR}:/opt/magic_mirror/${MM_MODULES_DIR}
+      - /data/docker/smart-mirror/${MM_CSS_DIR}:/opt/magic_mirror/${MM_CSS_DIR}
+    ports:
+      - $MM_SERVER_PORTS

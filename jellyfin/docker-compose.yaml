@@ -1,0 +1,28 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - JELLYFIN_PublishedServerUrl=media.jonnyebinger.de/jellyfin #optional
+    # user: 1000:1000
+    group_add:
+      - "105"
+    volumes:
+      - /data/docker/jellyfin/library:/config
+      - /ext-media/tv:/data/tvshows
+      - /ext-media/movies:/data/movies
+    ports:
+      - 8096:8096
+      - 8920:8920 #optional
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    restart: unless-stopped
+    networks:
+      - proxy-net
+ 
+networks:
+    proxy-net:
+      external: true

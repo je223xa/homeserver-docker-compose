@@ -1,0 +1,4 @@
+url = "http://192.168.0.2:8000/post/ef71ab24fb062fdc8ea36cffe6bf"
+header = "Content-Type: application/json"
+output = /dev/null
+silent

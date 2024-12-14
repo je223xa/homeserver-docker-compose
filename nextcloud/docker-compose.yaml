@@ -1,0 +1,19 @@
+#  docker stop nextcloud-aio-apache nextcloud-aio-notify-push nextcloud-aio-nextcloud nextcloud-aio-imaginary nextcloud-aio-redis nextcloud-aio-database nextcloud-aio-talk nextcloud-aio-collabora nextcloud-aio-docker-socket-proxy nextcloud-aio-clamav
+services:
+  nextcloud-aio-mastercontainer:
+    image: nextcloud/all-in-one:latest
+    init: true
+    restart: always
+    container_name: nextcloud-aio-mastercontainer
+    volumes:
+      - nextcloud_aio_mastercontainer:/mnt/docker-aio-config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /backup:/backup
+    ports:
+      - 8080:8080
+    environment: 
+      - APACHE_PORT=11000
+      - NEXTCLOUD_DATADIR=/data/docker/nextcloud
+volumes:
+  nextcloud_aio_mastercontainer:
+    name: nextcloud_aio_mastercontainer
