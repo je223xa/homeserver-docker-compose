@@ -1,7 +1,7 @@
 name: vpn-stack
 services:
   delugevpn:
-    image: binhex/arch-delugevpn:latest
+    image: binhex/arch-delugevpn:2.1.1-8-03
     container_name: delugevpn
     cap_add:
       - NET_ADMIN
@@ -33,6 +33,12 @@ services:
     networks:
       - proxy-net
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:8112/ && ! curl -s ifconfig.me --ipv4 | grep -q '^31.'"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
   jackett:
     image: linuxserver/jackett:latest
     container_name: jackett
@@ -47,7 +53,8 @@ services:
       - /data/docker/media/jackett/config:/config # config files
     restart: unless-stopped
     depends_on:
-      - delugevpn
+      delugevpn:
+        condition: service_healthy
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
@@ -63,7 +70,8 @@ services:
         #- /path/to/downloadclient-downloads:/downloads #optional
     restart: unless-stopped
     depends_on:
-      - delugevpn
+      delugevpn:
+        condition: service_healthy
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
@@ -79,7 +87,8 @@ services:
       - /ext-media/downloads:/downloads
     restart: unless-stopped
     depends_on:
-      - delugevpn
+      delugevpn:
+        condition: service_healthy
 
 
 networks:
