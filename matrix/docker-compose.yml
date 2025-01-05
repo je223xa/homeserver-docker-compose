@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
   webhook:
     container_name: matrix-webhook
-    image: matrix-webhook-image
+    #image: matrix-webhook-image
     restart: unless-stopped
     env_file:
       - .env
