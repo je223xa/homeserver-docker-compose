@@ -59,3 +59,8 @@ synapse.jonnyebinger.de {
 	
 }
 ```
+
+## Webhook
+Webhook is sourced from [gabbysHub](https://github.com/gabbysHub/matrix-webhook)
+How have to clone this into this directory, to use the paths from my compose file as they are
+Also you have to change the permission of the `docker-entrypoint.sh` file with `chmod 755 matrix-webhook/docker-entrypoint.sh`
