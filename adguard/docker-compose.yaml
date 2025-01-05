@@ -1,7 +1,7 @@
 name: adguard
 services:
     adguardhome:
-        image: adguard/adguardhome:latest
+        image: adguard/adguardhome:v0.107.55
         container_name: adguardhome
         restart: always
         volumes:
