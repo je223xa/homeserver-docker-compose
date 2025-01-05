@@ -9,7 +9,7 @@ services:
     networks:
       - default
   linkwarden:
-    image: ghcr.io/linkwarden/linkwarden:latest # comment this line to build from source
+    image: ghcr.io/linkwarden/linkwarden:latest
     container_name: linkwarden
     env_file: .env
     environment:
