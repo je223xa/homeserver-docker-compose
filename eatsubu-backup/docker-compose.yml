@@ -1,0 +1,44 @@
+services:
+  db:
+    # We use a mariadb image which supports both amd64 & arm64 architecture
+    container_name: eatsubu-backup-wp-db
+    image: mysql:5.7.44
+    command: '--default-authentication-plugin=mysql_native_password'
+    env_file:
+      - .env
+    volumes:
+      - /data/docker/eatsubu-backup/db:/var/lib/mysql
+    restart: always
+    ports:
+      - 3306
+      - 33060
+    # healthcheck:
+    #   test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+    #   start_period: 10s
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 3
+    networks:
+      default:
+  wordpress:
+    image: wordpress:php5.6
+    container_name: eatsubu-backup-wp
+    volumes:
+      - /data/docker/eatsubu-backup/wp:/var/www/html
+    env_file:
+      - .env
+    ports:
+      - 9003:80
+    networks:
+      default:
+      proxy-net:
+        ipv4_address: 172.19.0.21
+    restart: always
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
+
+networks:
+  proxy-net:
+    external: true
+  default:
