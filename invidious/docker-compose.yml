@@ -1,6 +1,7 @@
 services:
   invidious:
-    image: quay.io/invidious/invidious:latest
+    container_name: invidious-main
+    image: quay.io/invidious/invidious:master
     # image: quay.io/invidious/invidious:latest-arm64 # ARM64/AArch64 devices
     restart: unless-stopped
     ports:
@@ -29,6 +30,7 @@ services:
       - invidious-db
 
   inv_sig_helper:
+    container_name: invidious-helper
     image: quay.io/invidious/inv-sig-helper:latest
     init: true
     command: ["--tcp", "0.0.0.0:12999"]
@@ -44,6 +46,7 @@ services:
       - no-new-privileges:true
 
   invidious-db:
+    container_name: invidious-db
     image: docker.io/library/postgres:14
     restart: unless-stopped
     volumes:
