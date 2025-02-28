@@ -15,7 +15,7 @@ services:
     networks:
       default:
   wordpress:
-    image: wordpress:latest
+    image: wordpress:php8.1
     container_name: eatsubu-wp
     volumes:
       - /data/docker/eatsubu/wp:/var/www/html
