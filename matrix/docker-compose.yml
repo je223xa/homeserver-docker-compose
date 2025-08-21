@@ -7,7 +7,7 @@ services:
     volumes:
         - /data/docker/matrix/data:/data
     ports:
-      - 8008:8008
+      - 9201:8008
     environment:
         - SYNAPSE_SERVER_NAME=matrix.jonnyebinger.de
         - SYNAPSE_REPORT_STATS=yes
@@ -16,17 +16,17 @@ services:
       proxy-net:
         ipv4_address: 172.19.0.14
       default:
-    restart: unless-stopped
+    restart: always
   webhook:
     container_name: matrix-webhook
     #image: matrix-webhook-image
-    restart: unless-stopped
+    restart: always
     env_file:
       - .env
     build:
       context: .
     ports:
-      - "8000:8000"
+      - 9202:8000
     volumes:
       - ./store:/config
     depends_on: 
@@ -48,6 +48,7 @@ services:
     networks:
       proxy-net:
         ipv4_address: 172.19.0.17
+    restart: always
   syncv3:
     image: ghcr.io/matrix-org/sliding-sync:latest
     container_name: syncv3
@@ -57,7 +58,7 @@ services:
       matrix:
         condition: service_started
     ports:
-      - ${SYNCV3_PORT}:${SYNCV3_PORT}
+      - 9203:${SYNCV3_PORT}
     env_file:
       - ./.env
     networks: 

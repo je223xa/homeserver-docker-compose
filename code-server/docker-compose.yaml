@@ -15,22 +15,6 @@ services:
     networks:
       - proxy-net
 
-  npm-server:
-    build: 
-      context: .
-      dockerfile: npm.Dockerfile
-    container_name: npm-server
-    env_file:
-      - .env
-    volumes:
-      - /data/docker/npm-server:/config
-    ports:
-      - 9102:8443
-      - 5173:5173
-    restart: unless-stopped
-    networks:
-      - proxy-net
-
   ev-server:
     build: 
       context: .

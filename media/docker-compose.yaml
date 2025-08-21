@@ -1,7 +1,7 @@
 name: vpn-stack
 services:
   delugevpn:
-    image: binhex/arch-delugevpn:2.1.1-8-03
+    image: binhex/arch-delugevpn:2.2.0-1-02
     container_name: delugevpn
     cap_add:
       - NET_ADMIN
@@ -13,6 +13,8 @@ services:
       - 9117:9117 # jackett
       - 7878:7878 # radarr
       - 8989:8989 # sonarr
+      - 8686:8686 # lidarr
+      - 5055:5055
     volumes:
       - /data/docker/media/vpn/data:/data
       - /data/docker/media/vpn/config:/config
@@ -34,19 +36,18 @@ services:
       - proxy-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "sh", "-c", "curl -f http://localhost:8112/ && ! curl -s ifconfig.me --ipv4 | grep -q '^31.'"]
+      test: ["CMD", "sh", "-c", "curl -f http://localhost:8112/ && ! curl -s ifconfig.me --ipv4 | grep -q '^2.'"]
       interval: 30s
       timeout: 60s
       retries: 5
-      start_period: 10s
+      start_period: 1m
   jackett:
     image: linuxserver/jackett:latest
     container_name: jackett
     network_mode: container:delugevpn
-    environment:
-      - TZ=Europe/Berlin
-      - PUID=1000
-      - PGID=1000
+    # user: 1000:1000
+    env_file:
+      - .rr.env
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /ext-media/old-torrents:/old-torrents # place where to put .torrent files for manual download
@@ -59,15 +60,13 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     network_mode: container:delugevpn
-    environment:
-      - TZ=Europe/Berlin
-      - PUID=1000
-      - PGID=1000
+    # user: 1000:1000
+    env_file:
+      - .rr.env
     volumes:
       - /data/docker/media/radarr/config:/config
       - /ext-media/movies:/movies #optional
       - /ext-media/downloads:/downloads
-        #- /path/to/downloadclient-downloads:/downloads #optional
     restart: unless-stopped
     depends_on:
       delugevpn:
@@ -76,20 +75,50 @@ services:
     image: lscr.io/linuxserver/sonarr:latest
     container_name: sonarr
     network_mode: container:delugevpn
-    environment:
-      - TZ=Europe/Berlin
-      - PUID=1000
-      - PGID=1000
+    # user: 1000:1000
+    env_file:
+      - .rr.env
     volumes:
       - /data/docker/media/sonarr/config:/config
       - /ext-media/tv:/tv #optional
-        #- /path/to/downloadclient-downloads:/downloads #optional
       - /ext-media/downloads:/downloads
     restart: unless-stopped
     depends_on:
       delugevpn:
         condition: service_healthy
-
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    network_mode: container:delugevpn
+    # user: 1000:1000
+    env_file:
+      - .rr.env
+    volumes:
+      - /data/docker/media/lidarr/config:/config
+      - /ext-media/music:/music #optional
+      - /ext-media/downloads:/downloads
+    restart: unless-stopped
+    depends_on:
+      delugevpn:
+        condition: service_healthy
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    env_file:
+      - .rr.env
+    network_mode: container:delugevpn
+    volumes:
+      - /data/docker/media/jellyseerr/config:/app/config
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/status || exit 1
+      start_period: 20s
+      timeout: 3s
+      interval: 15s
+      retries: 3
+    restart: unless-stopped
+    depends_on:
+      delugevpn:
+        condition: service_healthy
 
 networks:
   proxy-net:
