@@ -1,0 +1,39 @@
+services:
+  broker:
+    container_name: paperless-cache
+    image: docker.io/library/redis:8
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    networks:
+      - paperless
+  webserver:
+    container_name: paperless
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    depends_on:
+      - broker
+    ports:
+      - "8000:8000"
+    volumes:
+      - /data/docker/paperless-ng/data:/usr/src/paperless/data
+      - /data/docker/paperless-ng/media:/usr/src/paperless/media
+      - /data/docker/paperless-ng/export:/usr/src/paperless/export
+      - /data/docker/paperless-ng/consume:/usr/src/paperless/consume
+    env_file: docker-compose.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+    networks: 
+      paperless:
+      proxy-net:
+        ipv4_address: 172.19.0.21
+
+volumes:
+  redisdata:
+
+
+networks:
+  paperless:
+  proxy-net: 
+    external:
+      true
