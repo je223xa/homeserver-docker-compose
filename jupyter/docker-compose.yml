@@ -1,0 +1,10 @@
+services:
+  jupyter:
+    container_name: jupyter
+    image: jupyter/scipy-notebook
+    ports:
+      - 8888:8888
+    volumes:
+      - /data/docker/jupyter/src:/home/jovyan/work/src
+      - /data/docker/jupyter/data:/home/jovyan/work/data
+    command: "start-notebook.sh"
