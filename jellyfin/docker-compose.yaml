@@ -12,9 +12,9 @@ services:
       - "105"
     volumes:
       - /data/docker/jellyfin/library:/config
-      - /ext-media/tv:/data/tvshows
-      - /ext-media/movies:/data/movies
-      - /ext-media/music:/data/music
+      - /ext-media/starr-data/media/tv:/data/tvshows
+      - /ext-media/starr-data/media/movies:/data/movies
+      - /ext-media/starr-data/media/music:/data/music
     ports:
       - 9002:8096
     devices:

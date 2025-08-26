@@ -14,12 +14,13 @@ services:
       - 7878:7878 # radarr
       - 8989:8989 # sonarr
       - 8686:8686 # lidarr
-      - 5055:5055
+      - 5055:5055 # jellyseerr
+      - 9696:9696 # prowlarr
+      - 8191:8191 # flaresolverr
     volumes:
-      - /data/docker/media/vpn/data:/data
       - /data/docker/media/vpn/config:/config
       - /etc/localtime:/etc/localtime:ro
-      - /ext-media/downloads:/downloads
+      - /ext-media/starr-data:/data
     env_file:
       - .env
     dns:
@@ -50,7 +51,7 @@ services:
       - .rr.env
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /ext-media/old-torrents:/old-torrents # place where to put .torrent files for manual download
+      - /ext-media/torrents:/torrents # place where to put .torrent files for manual download
       - /data/docker/media/jackett/config:/config # config files
     restart: unless-stopped
     depends_on:
@@ -65,8 +66,7 @@ services:
       - .rr.env
     volumes:
       - /data/docker/media/radarr/config:/config
-      - /ext-media/movies:/movies #optional
-      - /ext-media/downloads:/downloads
+      - /ext-media/starr-data:/data
     restart: unless-stopped
     depends_on:
       delugevpn:
@@ -80,8 +80,7 @@ services:
       - .rr.env
     volumes:
       - /data/docker/media/sonarr/config:/config
-      - /ext-media/tv:/tv #optional
-      - /ext-media/downloads:/downloads
+      - /ext-media/starr-data:/data #optional
     restart: unless-stopped
     depends_on:
       delugevpn:
@@ -95,8 +94,7 @@ services:
       - .rr.env
     volumes:
       - /data/docker/media/lidarr/config:/config
-      - /ext-media/music:/music #optional
-      - /ext-media/downloads:/downloads
+      - /ext-media/starr-data:/data #optional
     restart: unless-stopped
     depends_on:
       delugevpn:
@@ -119,7 +117,30 @@ services:
     depends_on:
       delugevpn:
         condition: service_healthy
-
+  prowlarr:
+    container_name: prowlarr
+    image: linuxserver/prowlarr
+    network_mode: container:delugevpn
+    env_file:
+      - .rr.env
+    volumes:
+      - /data/docker/media/prowlarr/config:/config
+    restart: unless-stopped
+    depends_on:
+      delugevpn:
+        condition: service_healthy
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    network_mode: container:delugevpn
+    env_file:
+      - .rr.env
+    volumes:
+      - /data/docker/media/flaresolverr/config:/config
+    restart: unless-stopped
+    depends_on:
+      delugevpn:
+        condition: service_healthy
 networks:
   proxy-net:
     external: true

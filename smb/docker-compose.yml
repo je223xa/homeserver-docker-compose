@@ -10,7 +10,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /ext-media/tv:/shares/tv
-      - /ext-media/movies:/shares/movies
+      - /ext-media/starr-data/media/tv:/shares/tv
+      - /ext-media/starr-data/media/movies:/shares/movies
     restart: always
       
