@@ -1,3 +1,5 @@
 *.env
 /matrix/store/
 /matrix/matrix-webhook/
+service-world/
+invidious/
