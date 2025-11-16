@@ -14,23 +14,8 @@ services:
     # command: generate
     networks: 
       proxy-net:
-        ipv4_address: 172.19.0.14
       default:
     restart: always
-  webhook:
-    container_name: matrix-webhook
-    #image: matrix-webhook-image
-    restart: always
-    env_file:
-      - .env
-    build:
-      context: .
-    ports:
-      - 9202:8000
-    volumes:
-      - ./store:/config
-    depends_on: 
-      - matrix
   syncv3postgres:
     image: postgres:13
     container_name: syncv3postgres
@@ -47,7 +32,6 @@ services:
       start_period: 80s  
     networks:
       proxy-net:
-        ipv4_address: 172.19.0.17
     restart: always
   syncv3:
     image: ghcr.io/matrix-org/sliding-sync:latest
@@ -63,7 +47,6 @@ services:
       - ./.env
     networks: 
       proxy-net:
-        ipv4_address: 172.19.0.16
 networks:
   proxy-net: 
     external:
