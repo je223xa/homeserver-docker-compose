@@ -26,7 +26,6 @@ services:
     networks: 
       paperless:
       proxy-net:
-        ipv4_address: 172.19.0.21
 
 volumes:
   redisdata:
