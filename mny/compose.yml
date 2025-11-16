@@ -1,0 +1,14 @@
+services:
+  mny:
+    image: tanq16/expenseowl:main
+    container_name: mny
+    ports:
+      - 8094:8080
+    volumes:
+      - /data/docker/mny:/app/data
+    networks:
+      - proxy-net
+
+networks:
+  proxy-net:
+    external: true
